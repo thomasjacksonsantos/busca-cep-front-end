@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Consulte CEPs com rapidez e precisão. Ideal para integrações via API e sistemas.">
-  <meta name="keywords" content="Consulta de CEP, API de CEP, Consultar CEP">
+  <meta name="description" content="Consulte CEPs gratuitamente com rapidez e precisão. Ideal para integrações via API e sistemas.">
+  <meta name="keywords" content="Consulta de CEP grátis, API de CEP grátis, Consultar CEP online">
   <meta name="author" content="Seu Nome">
-  <title>Consulta de CEP Rápida e Precisa</title>
+  <title>Busca CEP API - Consulta de CEP Grátis</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       line-height: 1.6;
       margin: 0;
       padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
     header {
       background-color: #4CAF50;
@@ -21,51 +24,182 @@
       text-align: center;
     }
     section {
+      flex: 1;
       padding: 20px;
     }
     .container {
       max-width: 800px;
       margin: auto;
+      padding: 10px;
     }
-    .plans {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 20px;
-    }
-    .plan {
+    .api-section {
+      background-color: #f4f4f9;
+      padding: 20px;
       border: 1px solid #ddd;
       border-radius: 5px;
-      padding: 15px;
-      text-align: center;
-      width: 30%;
+      margin-bottom: 30px;
     }
-    .plan h3 {
+    .api-section h2 {
       color: #4CAF50;
+      text-align: center;
     }
-    .button {
+    .api-endpoint {
+      font-family: "Courier New", Courier, monospace;
+      font-size: 16px;
+      background: #333;
+      color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      word-wrap: break-word;
+    }
+    .api-contract {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .api-contract pre {
+      font-family: "Courier New", Courier, monospace;
+      background: #333;
+      color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .search-section {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .search-input {
+      width: 100%;
+      max-width: 500px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .search-button {
       background-color: #4CAF50;
       color: white;
       padding: 10px 15px;
-      text-decoration: none;
+      font-size: 16px;
+      border: none;
       border-radius: 5px;
-      display: inline-block;
+      cursor: pointer;
     }
-    .button:hover {
+    .search-button:hover {
       background-color: #45a049;
+    }
+    .result-section {
+      margin-top: 20px;
+      text-align: left;
+      background-color: #f9f9f9;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    .result-section pre {
+      font-family: "Courier New", Courier, monospace;
+      background: #333;
+      color: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
     }
     footer {
       text-align: center;
       padding: 10px;
       background: #333;
       color: white;
-      margin-top: 20px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .api-endpoint {
+        font-size: 14px;
+      }
+      .api-contract pre {
+        font-size: 14px;
+      }
+      .search-button {
+        width: 100%;
+      }
+    }
+    @media (max-width: 480px) {
+      .search-input {
+        font-size: 14px;
+        padding: 8px;
+      }
+      .search-button {
+        font-size: 14px;
+        padding: 8px;
+      }
+      .api-section, .result-section {
+        padding: 15px;
+      }
     }
   </style>
+  <script>
+    function applyCepMask(input) {
+      const value = input.value.replace(/\D/g, '');
+      input.value = value.replace(/^(\d{5})(\d{1,3})?/, '$1-$2').replace(/-$/, '');
+    }
+
+    function isValidCep(cep) {
+      return /^[0-9]{5}-[0-9]{3}$/.test(cep);
+    }
+
+    async function buscarCEP() {
+      const cepInput = document.getElementById('cep-input');
+      const cep = cepInput.value;
+      const errorMessage = document.getElementById('error-message');
+      const resultSection = document.getElementById('result-section');
+
+      errorMessage.textContent = '';
+      resultSection.innerHTML = '';
+
+      if (!cep) {
+        errorMessage.textContent = 'O campo CEP está vazio. Por favor, insira um CEP.';
+        return;
+      }
+
+      if (!isValidCep(cep)) {
+        errorMessage.textContent = 'O CEP inserido é inválido. Por favor, insira no formato 12345-678.';
+        return;
+      }
+
+      const apiUrl = `https://buscacepapi-beevasdacnfcfjbc.brazilsouth-01.azurewebsites.net/api/v1/cep/${cep}`;
+
+      try {
+        resultSection.innerHTML = 'Carregando...';
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error('CEP não encontrado ou erro na API.');
+        }
+        const data = await response.json();
+        resultSection.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+      } catch (error) {
+        resultSection.innerHTML = `<p style="color: red;">${error.message}</p>`;
+      }
+    }
+  </script>
 </head>
 <body>
   <header>
-    <h1>Consulta de CEP Rápida e Precisa</h1>
-    <p>Resolva suas necessidades de consulta de CEP com eficiência!</p>
+    <h1>Busca CEP API - Consulta de CEP Grátis</h1>
+    <p>Consulte CEPs de todo o Brasil de forma gratuita e sem complicações!</p>
   </header>
   <section>
     <div class="container">
@@ -73,34 +207,53 @@
       <ul>
         <li>API fácil de integrar</li>
         <li>Consulta rápida e precisa</li>
-        <li>Preços acessíveis</li>
+        <li>Grátis para consultas ilimitadas</li>
       </ul>
-
-      <h2>Planos Disponíveis</h2>
-      <div class="plans">
-        <div class="plan">
-          <h3>Básico</h3>
-          <p>Até 1.000 consultas/mês</p>
-          <p><strong>R$ 29,90/mês</strong></p>
-          <a href="#" class="button">Comprar Agora</a>
-        </div>
-        <div class="plan">
-          <h3>Profissional</h3>
-          <p>Até 10.000 consultas/mês</p>
-          <p><strong>R$ 99,90/mês</strong></p>
-          <a href="#" class="button">Comprar Agora</a>
-        </div>
-        <div class="plan">
-          <h3>Empresarial</h3>
-          <p>Consultas ilimitadas</p>
-          <p><strong>R$ 299,90/mês</strong></p>
-          <a href="#" class="button">Comprar Agora</a>
-        </div>
+    </div>
+  </section>
+  <section class="search-section">
+    <div class="container">
+      <h2>Busque um CEP agora</h2>
+      <input
+        type="text"
+        id="cep-input"
+        class="search-input"
+        placeholder="Digite o CEP (ex: 12345-678)"
+        oninput="applyCepMask(this)"
+      />
+      <div id="error-message" class="error-message"></div>
+      <button class="search-button" onclick="buscarCEP()">Buscar CEP</button>
+      <div id="result-section" class="result-section"></div>
+    </div>
+  </section>
+  <section class="api-section">
+    <div class="container">
+      <h2>API Pública - Contrato de Retorno</h2>
+      <p>Consuma nossa API para integrar CEPs ao seu sistema. Endpoint disponível:</p>
+      <div class="api-endpoint">
+        https://buscacepapi-beevasdacnfcfjbc.brazilsouth-01.azurewebsites.net/api/v1/cep/{cep}
+      </div>
+      <h3>Contrato de Retorno:</h3>
+      <div class="api-contract">
+        <pre>{
+  "endereco": {
+    "estado": "string",
+    "cidade": "string",
+    "logradouro": "string",
+    "bairro": "string",
+    "complemento": "string",
+    "latitude": "string",
+    "longitude": "string"
+  },
+  "erros": [
+    "string"
+  ]
+}</pre>
       </div>
     </div>
   </section>
   <footer>
-    <p>&copy; 2025 Consulta de CEP. Todos os direitos reservados.</p>
+    <p>&copy; 2025 Busca CEP API. Todos os direitos reservados.</p>
   </footer>
 </body>
 </html>
