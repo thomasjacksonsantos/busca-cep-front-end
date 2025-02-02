@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Consulte CEPs gratuitamente com rapidez e precisão. Ideal para integrações via API e sistemas.">
+  <meta name="description"
+    content="Consulte CEPs gratuitamente com rapidez e precisão. Ideal para integrações via API e sistemas.">
   <meta name="keywords" content="Consulta de CEP grátis, API de CEP grátis, Consultar CEP online">
   <meta name="author" content="Seu Nome">
   <title>Busca CEP API - Consulta de CEP Grátis</title>
@@ -17,21 +19,25 @@
       flex-direction: column;
       min-height: 100vh;
     }
+
     header {
       background-color: #4CAF50;
       color: white;
       padding: 20px 10px;
       text-align: center;
     }
+
     section {
       flex: 1;
       padding: 20px;
     }
+
     .container {
       max-width: 800px;
       margin: auto;
       padding: 10px;
     }
+
     .api-section {
       background-color: #f4f4f9;
       padding: 20px;
@@ -39,10 +45,12 @@
       border-radius: 5px;
       margin-bottom: 30px;
     }
+
     .api-section h2 {
       color: #4CAF50;
       text-align: center;
     }
+
     .api-endpoint {
       font-family: "Courier New", Courier, monospace;
       font-size: 16px;
@@ -52,6 +60,7 @@
       border-radius: 5px;
       word-wrap: break-word;
     }
+
     .api-contract {
       background-color: #f9f9f9;
       padding: 20px;
@@ -59,6 +68,7 @@
       border-radius: 5px;
       overflow-x: auto;
     }
+
     .api-contract pre {
       font-family: "Courier New", Courier, monospace;
       background: #333;
@@ -68,10 +78,11 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
+
     .search-section {
       text-align: center;
-      margin-top: 30px;
     }
+
     .search-input {
       width: 100%;
       max-width: 500px;
@@ -81,11 +92,13 @@
       border-radius: 5px;
       margin-bottom: 10px;
     }
+
     .error-message {
       color: red;
       font-size: 14px;
       margin-bottom: 10px;
     }
+
     .search-button {
       background-color: #4CAF50;
       color: white;
@@ -95,9 +108,11 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
     .search-button:hover {
       background-color: #45a049;
     }
+
     .result-section {
       margin-top: 20px;
       text-align: left;
@@ -107,6 +122,7 @@
       border-radius: 5px;
       overflow-x: auto;
     }
+
     .result-section pre {
       font-family: "Courier New", Courier, monospace;
       background: #333;
@@ -116,37 +132,43 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
+
     footer {
       text-align: center;
       padding: 10px;
       background: #333;
       color: white;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
+      margin-top: 30px;
     }
+
     /* Responsividade */
     @media (max-width: 768px) {
       .api-endpoint {
         font-size: 14px;
       }
+
       .api-contract pre {
         font-size: 14px;
       }
+
       .search-button {
         width: 100%;
       }
     }
+
     @media (max-width: 480px) {
       .search-input {
         font-size: 14px;
         padding: 8px;
       }
+
       .search-button {
         font-size: 14px;
         padding: 8px;
       }
-      .api-section, .result-section {
+
+      .api-section,
+      .result-section {
         padding: 15px;
       }
     }
@@ -184,7 +206,14 @@
 
       try {
         resultSection.innerHTML = 'Carregando...';
-        const response = await fetch(apiUrl);
+        const response = await fetch(apiUrl, {
+          method: "GET",
+          headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(response)
         if (!response.ok) {
           throw new Error('CEP não encontrado ou erro na API.');
         }
@@ -194,8 +223,18 @@
         resultSection.innerHTML = `<p style="color: red;">${error.message}</p>`;
       }
     }
+
+    function enviarMensagem() {
+      const message = document.getElementById('message-input').value;
+      if (message) {
+        window.location.href = `mailto:thomas.j.santos@gmail.com?subject=Mensagem do site&body=${encodeURIComponent(message)}`;
+      } else {
+        alert('Por favor, escreva uma mensagem antes de enviar.');
+      }
+    }
   </script>
 </head>
+
 <body>
   <header>
     <h1>Busca CEP API - Consulta de CEP Grátis</h1>
@@ -214,13 +253,8 @@
   <section class="search-section">
     <div class="container">
       <h2>Busque um CEP agora</h2>
-      <input
-        type="text"
-        id="cep-input"
-        class="search-input"
-        placeholder="Digite o CEP (ex: 12345-678)"
-        oninput="applyCepMask(this)"
-      />
+      <input type="text" id="cep-input" class="search-input" placeholder="Digite o CEP (ex: 12345-678)"
+        oninput="applyCepMask(this)" />
       <div id="error-message" class="error-message"></div>
       <button class="search-button" onclick="buscarCEP()">Buscar CEP</button>
       <div id="result-section" class="result-section"></div>
@@ -252,8 +286,20 @@
       </div>
     </div>
   </section>
+
+  <!-- Seção de Contato -->
+  <section class="api-section">
+    <div class="container">
+      <h2>Entre em Contato</h2>
+      <p>Tem alguma dúvida ou sugestão? </p>
+      <p>Envie uma mensagem para nós:</p>
+      <p> <b>thomas.j.santos@gmail.com</b></p>
+    </div>
+  </section>
+
   <footer>
     <p>&copy; 2025 Busca CEP API. Todos os direitos reservados.</p>
   </footer>
 </body>
+
 </html>
